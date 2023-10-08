@@ -9,6 +9,9 @@
 
 <body>
   <div class="container">
+    <div class="list-loader hidden">
+      <span>Комментарии загружаются...</span>
+    </div>
     <ul id="list" class="comments">
 
     </ul>
@@ -40,6 +43,17 @@
   const commentInputElement = document.getElementById("comment-input");
   const currentDate = new Date().toLocaleString().slice(0, -3);
 
+  function showLoadingIndicator() {
+    const loader = document.querySelector(".list-loader");
+    loader.classList.remove("hidden");
+
+  }
+
+  function deleteLoadingIndicator() {
+    const loader = document.querySelector(".list-loader");
+    loader.classList.add("hidden");
+  }
+
   let comments = [
     // {
     //   name: 'Глеб Фокин',
@@ -60,7 +74,8 @@
   const url = "https://wedev-api.sky.pro/api/v1/maxim-trankov"
 
   function getComment() {
-    const fetchPromise = fetch(`${url}/comments`, {
+    showLoadingIndicator();
+    fetchPromise = fetch(`${url}/comments`, {
       method: "GET",
     });
 
@@ -75,9 +90,13 @@
 
 
         comments = data.comments;
+
         renderElements();
       });
+    deleteLoadingIndicator();
   }
+
+  buttonElement.disable
 
   function postComment() {
     let fetchPromise = fetch(`${url}/comments`, {
@@ -98,9 +117,15 @@
           alert("Неверный запрос");
           throw new Error("Неверный запрос");
         }
-        getComment();
+      })
+      .then((data) => {
+        renderElements();
+        buttonElement.disabled = false;
+        buttonElement.textContent = "Написать";
       });
+    getComment();
   };
+  renderElements();
 
   function deleteApiComment(id) {
 
@@ -164,7 +189,6 @@
 
 
 
-
   // buttonElement.addEventListener("click", () => {
 
   //   nameInputElement.classList.remove("error");
@@ -206,8 +230,9 @@
   });
 
   function addComment() {
-
     buttonElement.addEventListener('click', () => {
+      buttonElement.disabled = true;
+      buttonElement.textContent = "Комментарий добавлятся...";
       nameInputElement.classList.remove("error");
       commentInputElement.classList.remove("error");
       if (nameInputElement.value === '' || commentInputElement.value === '') {
@@ -229,7 +254,7 @@
     });
   };
   addComment();
-
+  renderElements();
 
   //leet code
 
