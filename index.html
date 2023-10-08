@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>Проект "Комменты"</title>
+  <title>Комменты</title>
   <meta charset="utf-8" />
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -14,9 +14,9 @@
     </ul>
     <div class="add-form">
       <input minlength="1" maxlength="25" id="name-input" type="text" class="add-form-name"
-        placeholder="Введите ваше имя" />
+        placeholder="Введите ваше имя (Больше 2 символов)" />
       <textarea minlength="1" maxlength="200" id="comment-input" type="textarea" class="add-form-text"
-        placeholder="Введите ваш коментарий" rows="4"></textarea>
+        placeholder="Введите ваш коментарий (Больше 2 символов)" rows="4"></textarea>
       <div class="add-form-row" id="add-button">
         <button id="add-button" class="add-form-button">Написать</button>
       </div>
@@ -33,6 +33,12 @@
   }
 </style>
 <script>
+
+  const buttonElement = document.getElementById("add-button");
+  const listElement = document.getElementById("list");
+  const nameInputElement = document.getElementById("name-input");
+  const commentInputElement = document.getElementById("comment-input");
+  const currentDate = new Date().toLocaleString().slice(0, -3);
 
   let comments = [
     // {
@@ -82,17 +88,18 @@
       }),
     });
 
-    fetchPromise.then((response) => {
-      if (response.status === 500) {
-        alert("Ошибка сервера");
-        throw new Error("Ошибка сервера");
-      }
-      if (response.status === 400) {
-        alert("Неверный запрос");
-        throw new Error("Неверный запрос");
-      }
-      getComment();
-    });
+    fetchPromise
+      .then((response) => {
+        if (response.status === 500) {
+          alert("Ошибка сервера");
+          throw new Error("Ошибка сервера");
+        }
+        if (response.status === 400) {
+          alert("Неверный запрос");
+          throw new Error("Неверный запрос");
+        }
+        getComment();
+      });
   };
 
   function deleteApiComment(id) {
@@ -156,11 +163,6 @@
   }
 
 
-  const buttonElement = document.getElementById("add-button");
-  const listElement = document.getElementById("list");
-  const nameInputElement = document.getElementById("name-input");
-  const commentInputElement = document.getElementById("comment-input");
-  const currentDate = new Date().toLocaleString().slice(0, -3);
 
 
   // buttonElement.addEventListener("click", () => {
@@ -228,8 +230,8 @@
   };
   addComment();
 
-  
-//leet code
+
+  //leet code
 
   function deleteComment() {
     const buttonDelete = document.querySelectorAll('.delete-button');
