@@ -51,24 +51,30 @@
     // }
   ];
 
-
+  const url = "https://wedev-api.sky.pro/api/v1/maxim-trankov"
 
   function getComment() {
-    const fetchPromise = fetch("https://wedev-api.sky.pro/api/v1/maxim-trankov/comments/", {
+    const fetchPromise = fetch(`${url}/comments`, {
       method: "GET",
     });
 
-    fetchPromise.then((response) => response.json()).then(data => {
+    fetchPromise
+      .then((response) => {
+        if (response.status === 500) {
+          throw new Error("Ошибка сервера");
+        } if (response.status === 400) { throw new Error("Неверный запрос"); }
+        return response.json();
+      })
+      .then(data => {
 
-      comments = data.comments;
-      console.log(comments);
-      renderElements();
 
-    });
+        comments = data.comments;
+        renderElements();
+      });
   }
 
-  function newApiComment() {
-    let fetchPromise = fetch("https://wedev-api.sky.pro/api/v1/maxim-trankov/comments/", {
+  function postComment() {
+    let fetchPromise = fetch(`${url}/comments`, {
       method: "POST",
       body: JSON.stringify({
         name: nameInputElement.value,
@@ -76,30 +82,23 @@
       }),
     });
 
-    fetchPromise.then((response) => console.log(response)).then(() => {
-
-      // fetch("https://wedev-api.sky.pro/api/v1/maxim-trankov/comments").then(response => response.json()).then(data => {
-
-      //   comments = data.comments;
-      //   renderElements();
-      // })
-
+    fetchPromise.then((response) => {
+      if (response.status === 500) {
+        alert("Ошибка сервера");
+        throw new Error("Ошибка сервера");
+      }
+      if (response.status === 400) {
+        alert("Неверный запрос");
+        throw new Error("Неверный запрос");
+      }
+      getComment();
     });
   };
 
-  function deleteApiComment() {
-    let fetchPromise = fetch("https://wedev-api.sky.pro/api/v1/maxim-trankov/comments/" + id, {
-      method: "DELETE",
-    });
+  function deleteApiComment(id) {
 
-    fetchPromise.then((response) => console.log(response)).then(() => {
-      renderElements();
-      // fetch("https://wedev-api.sky.pro/api/v1/maxim-trankov/comments").then(response => response.json()).then(data => {
-
-      //   comments = data.comments;
-      //   renderElements();
-      // })
-    });
+    comments = comments.filter(item => item.id !== +id);
+    renderElements();
   }
 
 
@@ -107,7 +106,6 @@
   function renderElements() {
     const commentsHTML = comments.map((element, index) => {
       const ourDate = new Date(element.date);
-      console.log(ourDate);
       return `<li class="comment" data-index="${index}">
         <div class="comment-header">
           <div>${element.author.name}</div>
@@ -121,12 +119,13 @@
         <div class="comment-footer">
           <div class="likes">
             <span class="likes-counter">${element.likes}</span>
-            <button data-id="${element.id}" class="like-button ${element.islike ? "-active-like" : ""}"></button>
+            <button data-index="${index}" class="like-button ${element.islike ? "-active-like" : ""}"></button>
             
           </div>
         </div>
         <button data-id="${element.id}" class="add-form-button delete-button">Удалить</button>
       </li>`
+
 
     }).join("");
     list.innerHTML = commentsHTML;
@@ -134,13 +133,14 @@
     commentOnComment();
     deleteComment();
   }
+
   renderElements();
   function addLike() {
     const likeElements = document.querySelectorAll('.like-button');
     for (let like of likeElements) {
       like.addEventListener('click', (event) => {
         event.stopPropagation();
-        let index = like.dataset.index
+        let index = like.dataset.index;
         let object = comments[index];
         if (object.islike) {
           object.islike = false;
@@ -196,7 +196,12 @@
 
   // });
 
-  // Вытащить запросы в отдельную функцию
+  nameInputElement.addEventListener("input", (e) => {
+    if (e.target.value) { nameInputElement.classList.remove("error") }
+  });
+  commentInputElement.addEventListener("input", (e) => {
+    if (e.target.value) { commentInputElement.classList.remove("error") }
+  });
 
   function addComment() {
 
@@ -208,8 +213,14 @@
         commentInputElement.classList.add("error");
         return;
       };
-
-      newApiComment();
+      if (nameInputElement.value.length < 3) {
+        nameInputElement.classList.add("error");
+      }
+      if (commentInputElement.value.length < 3) {
+        commentInputElement.classList.add("error");
+        return;
+      };
+      postComment();
       // renderElements();
       nameInputElement.value = "";
       commentInputElement.value = "";
@@ -217,18 +228,19 @@
   };
   addComment();
 
+  
+//leet code
+
   function deleteComment() {
     const buttonDelete = document.querySelectorAll('.delete-button');
     for (let button of buttonDelete) {
       button.addEventListener('click', (event) => {
         let id = button.dataset.id;
-        deleteApiComment();
+        deleteApiComment(id);
         event.stopPropagation();
         renderElements();
-        deleteApiComment();
       })
     }
-
   };
 
   function commentOnComment() {
