@@ -144,7 +144,7 @@
           <div>${ourDate.toLocaleString()}</div>
         </div>
         <div class="comment-body">
-          <div class="comment-text">
+          <div data-index class="comment-text">
             ${element.text}
           </div>
         </div>
@@ -272,16 +272,17 @@
 
   function commentOnComment() {
     const commentOnComment = document.querySelectorAll('.comment');
-    for (let comment of commentOnComment) {
+    for(let comment of commentOnComment) {
       comment.addEventListener('click', () => {
-        let index = comment.dataset.index;
+        let index = comment.dataset.index
         let object = comments[index];
-        commentInputElement.value = `${object.comment}  ${object.name}`;
+        commentInputElement.value = `${object.text}  ${object.author.name}`
         renderElements();
-      });
+      })
 
-    };
-  };
+    }
+ }
+
 
   getComment();
 </script>
