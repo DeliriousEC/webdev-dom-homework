@@ -87,13 +87,12 @@
         return response.json();
       })
       .then(data => {
-
-
         comments = data.comments;
 
         renderElements();
+        deleteLoadingIndicator();
       });
-    deleteLoadingIndicator();
+
   }
 
   buttonElement.disable
@@ -272,7 +271,7 @@
 
   function commentOnComment() {
     const commentOnComment = document.querySelectorAll('.comment');
-    for(let comment of commentOnComment) {
+    for (let comment of commentOnComment) {
       comment.addEventListener('click', () => {
         let index = comment.dataset.index
         let object = comments[index];
@@ -281,7 +280,7 @@
       })
 
     }
- }
+  }
 
 
   getComment();
