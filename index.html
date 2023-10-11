@@ -83,7 +83,9 @@
       .then((response) => {
         if (response.status === 500) {
           throw new Error("Ошибка сервера");
-        } if (response.status === 400) { throw new Error("Неверный запрос"); }
+        } if (response.status === 400) {
+          throw new Error("Неверный запрос");
+        }
         return response.json();
       })
       .then(data => {
@@ -103,27 +105,43 @@
       body: JSON.stringify({
         name: nameInputElement.value,
         text: commentInputElement.value,
+        forceError: true,
       }),
     });
 
     fetchPromise
       .then((response) => {
+        console.log(response);
         if (response.status === 500) {
           alert("Ошибка сервера");
-          throw new Error("Ошибка сервера");
+          return Promise.reject(new Error("Ошибка сервера"));
+
         }
-        if (response.status === 400) {
+        else if (response.status === 400) {
           alert("Неверный запрос");
-          throw new Error("Неверный запрос");
+          return Promise.reject(new Error("Неверный запрос"));
+        } else {
+          return response.json();
         }
-      })
+      } )
       .then((data) => {
         renderElements();
         buttonElement.disabled = false;
         buttonElement.textContent = "Написать";
+        nameInputElement.value = "";
+        commentInputElement.value = "";
+      }).catch((error) => {
+        // deleteLoadingIndicator();
+        // buttonElement.disabled = false;
+        buttonElement.disabled = false;
+        buttonElement.textContent = "Написать";
+        alert("Что-то пошло не так");
+        console.warn(error);
       });
     getComment();
+
   };
+
   renderElements();
 
   function deleteApiComment(id) {
@@ -237,19 +255,24 @@
       if (nameInputElement.value === '' || commentInputElement.value === '') {
         nameInputElement.classList.add("error");
         commentInputElement.classList.add("error");
+        buttonElement.disabled = false;
+        buttonElement.textContent = "Написать";
         return;
       };
       if (nameInputElement.value.length < 3) {
         nameInputElement.classList.add("error");
+        buttonElement.disabled = false;
+        buttonElement.textContent = "Написать";
       }
       if (commentInputElement.value.length < 3) {
         commentInputElement.classList.add("error");
+        buttonElement.disabled = false;
+        buttonElement.textContent = "Написать";
         return;
       };
       postComment();
       // renderElements();
-      nameInputElement.value = "";
-      commentInputElement.value = "";
+
     });
   };
   addComment();
