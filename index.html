@@ -111,18 +111,13 @@
 
     fetchPromise
       .then((response) => {
-        console.log(response);
         if (response.status === 500) {
-          alert("Ошибка сервера");
-          return Promise.reject(new Error("Ошибка сервера"));
-
-        }
-        else if (response.status === 400) {
-          alert("Неверный запрос");
-          return Promise.reject(new Error("Неверный запрос"));
-        } else {
-          return response.json();
-        }
+            throw new Error("Сервер упал, попробуй позже");
+          } else if (response.status === 400) {
+            throw new Error("Введите данные заново");
+          } else {
+            return response.json();
+          };
       } )
       .then((data) => {
         renderElements();
@@ -135,8 +130,7 @@
         // buttonElement.disabled = false;
         buttonElement.disabled = false;
         buttonElement.textContent = "Написать";
-        alert("Что-то пошло не так");
-        console.warn(error);
+          alert(error.message);
       });
     getComment();
 
