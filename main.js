@@ -1,4 +1,5 @@
 import { getCommentApi, postFetchApi } from "./api.js";
+import { renderElementsExp } from "./render.js";
 
 const buttonElement = document.getElementById("add-button");
 const listElement = document.getElementById("list");
@@ -17,9 +18,7 @@ function deleteLoadingIndicator() {
   loader.classList.add("hidden");
 }
 
-let comments = [
-
-];
+let comments = [];
 
 // const url = "https://wedev-api.sky.pro/api/v1/maxim-trankov"
 
@@ -59,7 +58,12 @@ function postComment() {
 
 };
 
-renderElements();
+function renderElements() {
+  renderElementsExp(comments);
+  addLike();
+  commentOnComment();
+  deleteComment();
+};
 
 function deleteApiComment(id) {
 
@@ -68,37 +72,6 @@ function deleteApiComment(id) {
 }
 
 
-
-function renderElements() {
-  const commentsHTML = comments.map((element, index) => {
-    const ourDate = new Date(element.date);
-    return `<li class="comment" data-index="${index}">
-      <div class="comment-header">
-        <div>${element.author.name}</div>
-        <div>${ourDate.toLocaleString()}</div>
-      </div>
-      <div class="comment-body">
-        <div data-index class="comment-text">
-          ${element.text}
-        </div>
-      </div>
-      <div class="comment-footer">
-        <div class="likes">
-          <span class="likes-counter">${element.likes}</span>
-          <button data-index="${index}" class="like-button ${element.islike ? "-active-like" : ""}"></button>
-          
-        </div>
-      </div>
-      <button data-id="${element.id}" class="add-form-button delete-button">Удалить</button>
-    </li>`
-
-
-  }).join("");
-  list.innerHTML = commentsHTML;
-  addLike();
-  commentOnComment();
-  deleteComment();
-}
 
 renderElements();
 function addLike() {

@@ -22,8 +22,8 @@ export function getCommentApi() {
 //             })
 // }
 
-export function postFetchApi({name, text}) {
-   return fetch("https://wedev-api.sky.pro/api/v1/maxim-trankov/comments", {
+export function postFetchApi({ name, text }) {
+    return fetch("https://wedev-api.sky.pro/api/v1/maxim-trankov/comments", {
         method: "POST",
         body: JSON.stringify({
             name: name,
@@ -38,6 +38,6 @@ export function postFetchApi({name, text}) {
             } else {
                 return response.json();
             };
-        }) 
+        })
 };
 
