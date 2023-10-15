@@ -1,3 +1,4 @@
+let comments = [];
 export function getCommentApi() {
     return fetch("https://wedev-api.sky.pro/api/v1/maxim-trankov/comments", {
         method: "GET",
