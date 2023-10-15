@@ -1,4 +1,4 @@
-import { getCommentApi } from "./api.js";
+import { getCommentApi, postFetchApi } from "./api.js";
 
 const buttonElement = document.getElementById("add-button");
 const listElement = document.getElementById("list");
@@ -38,38 +38,23 @@ function getComment() {
 buttonElement.disable
 
 function postComment() {
-  let fetchPromise = fetch("https://wedev-api.sky.pro/api/v1/maxim-trankov/comments", {
-    method: "POST",
-    body: JSON.stringify({
-      name: nameInputElement.value,
-      text: commentInputElement.value,
-      forceError: true,
-    }),
+  postFetchApi({
+    name: nameInputElement.value,
+    text: commentInputElement.value
+  }).then((data) => {
+    renderElements();
+    buttonElement.disabled = false;
+    buttonElement.textContent = "Написать";
+    nameInputElement.value = "";
+    commentInputElement.value = "";
+    getComment();
+  }).catch((error) => {
+    // deleteLoadingIndicator();
+    // buttonElement.disabled = false;
+    buttonElement.disabled = false;
+    buttonElement.textContent = "Написать";
+    alert("Сервер не отвечает.");
   });
-
-  fetchPromise
-    .then((response) => {
-      if (response.status === 500) {
-        throw new Error("Сервер упал, попробуй позже");
-      } else if (response.status === 400) {
-        throw new Error("Введите данные заново");
-      } else {
-        return response.json();
-      };
-    })
-    .then((data) => {
-      renderElements();
-      buttonElement.disabled = false;
-      buttonElement.textContent = "Написать";
-      nameInputElement.value = "";
-      commentInputElement.value = "";
-    }).catch((error) => {
-      // deleteLoadingIndicator();
-      // buttonElement.disabled = false;
-      buttonElement.disabled = false;
-      buttonElement.textContent = "Написать";
-      alert("Сервер не отвечает.");
-    });
   getComment();
 
 };
@@ -137,39 +122,7 @@ function addLike() {
 }
 
 
-
-// buttonElement.addEventListener("click", () => {
-
-//   nameInputElement.classList.remove("error");
-//   commentInputElement.classList.remove("error");
-
-//   if (nameInputElement.value === "" || commentInputElement.value === "") {
-
-//     nameInputElement.classList.add("error");
-//     commentInputElement.classList.add("error");
-//     return;
-//   }
-
-//   const currentDate = new Date().toLocaleString().slice(0, -3);
-
-//   comments.push({
-//     name: nameInputElement.value
-//       .replaceAll("&", "&amp;")
-//       .replaceAll("<", "&lt;")
-//       .replaceAll(">", "&gt;")
-//       .replaceAll('"', "&quot;"),
-//     date: currentDate,
-//     comment: commentInputElement.value
-//       .replaceAll("&", "&amp;")
-//       .replaceAll("<", "&lt;")
-//       .replaceAll(">", "&gt;")
-//       .replaceAll('"', "&quot;"),
-//     likes: 0,
-//     islike: false
-//   });
 renderElements();
-
-// });
 
 nameInputElement.addEventListener("input", (e) => {
   if (e.target.value) { nameInputElement.classList.remove("error") }
@@ -203,23 +156,24 @@ function addComment() {
       return;
     };
     postComment();
-    // renderElements();
 
   });
 };
 addComment();
 renderElements();
 
-//leet code
-
 function deleteComment() {
   const buttonDelete = document.querySelectorAll('.delete-button');
   for (let button of buttonDelete) {
     button.addEventListener('click', (event) => {
-      let id = button.dataset.id;
+      const id = button.dataset.id;
       deleteApiComment(id);
       event.stopPropagation();
       renderElements();
+
+      // deleteCommentApi({id}).then(() => {
+      //     getComment();
+      //   });
     })
   }
 };
@@ -236,6 +190,5 @@ function commentOnComment() {
 
   }
 }
-
 
 getComment();
