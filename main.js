@@ -1,3 +1,5 @@
+import { getCommentApi } from "./api.js";
+
 const buttonElement = document.getElementById("add-button");
 const listElement = document.getElementById("list");
 const nameInputElement = document.getElementById("name-input");
@@ -19,36 +21,24 @@ let comments = [
 
 ];
 
-const url = "https://wedev-api.sky.pro/api/v1/maxim-trankov"
+// const url = "https://wedev-api.sky.pro/api/v1/maxim-trankov"
 
 function getComment() {
   showLoadingIndicator();
-  fetchPromise = fetch(`${url}/comments`, {
-    method: "GET",
+
+  getCommentApi().then(data => {
+    comments = data.comments;
+
+    renderElements();
+    deleteLoadingIndicator();
   });
-
-  fetchPromise
-    .then((response) => {
-      if (response.status === 500) {
-        throw new Error("Ошибка сервера");
-      } if (response.status === 400) {
-        throw new Error("Неверный запрос");
-      }
-      return response.json();
-    })
-    .then(data => {
-      comments = data.comments;
-
-      renderElements();
-      deleteLoadingIndicator();
-    });
 
 }
 
 buttonElement.disable
 
 function postComment() {
-  let fetchPromise = fetch(`${url}/comments`, {
+  let fetchPromise = fetch("https://wedev-api.sky.pro/api/v1/maxim-trankov/comments", {
     method: "POST",
     body: JSON.stringify({
       name: nameInputElement.value,
@@ -60,13 +50,13 @@ function postComment() {
   fetchPromise
     .then((response) => {
       if (response.status === 500) {
-          throw new Error("Сервер упал, попробуй позже");
-        } else if (response.status === 400) {
-          throw new Error("Введите данные заново");
-        } else {
-          return response.json();
-        };
-    } )
+        throw new Error("Сервер упал, попробуй позже");
+      } else if (response.status === 400) {
+        throw new Error("Введите данные заново");
+      } else {
+        return response.json();
+      };
+    })
     .then((data) => {
       renderElements();
       buttonElement.disabled = false;
@@ -78,7 +68,7 @@ function postComment() {
       // buttonElement.disabled = false;
       buttonElement.disabled = false;
       buttonElement.textContent = "Написать";
-        alert(error.message);
+      alert("Сервер не отвечает.");
     });
   getComment();
 
